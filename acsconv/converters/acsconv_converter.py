@@ -1,11 +1,12 @@
 from .base_converter import BaseConverter
-from ..operators import ACSConv
+from ..operators import ACSConv, ACSTransposeConv
+
 
 class ACSConverter(BaseConverter):
     """
     Decorator class for converting 2d convolution modules
     to corresponding acs version in any networks.
-    
+
     Args:
         model (torch.nn.module): model that needs to be converted
     Warnings:
@@ -20,15 +21,18 @@ class ACSConverter(BaseConverter):
         >>> x = torch.rand(batch_size, in_channels, D, H, W)
         >>> out = m(x)
     """
-    converter_attributes = ['model']
+
+    converter_attributes = ["model"]
     target_conv = ACSConv
+    target_tranpose_conv = ACSTransposeConv
+
     def __init__(self, model):
-        """ Save the weights, convert the model to ACS counterpart, and then reload the weights """
+        """Save the weights, convert the model to ACS counterpart, and then reload the weights"""
         preserve_state_dict = model.state_dict()
         model = self.convert_module(model)
-        model.load_state_dict(preserve_state_dict,strict=False) # 
+        model.load_state_dict(preserve_state_dict, strict=False)  #
         self.model = model
 
     def convert_conv_kwargs(self, kwargs):
-        kwargs['bias'] = True if kwargs['bias'] is not None else False
+        kwargs["bias"] = True if kwargs["bias"] is not None else False
         return kwargs
