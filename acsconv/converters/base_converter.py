@@ -78,8 +78,8 @@ class BaseConverter(object):
                             child.__class__.__name__
                         )
                     )
-            elif isinstance(child, nn.Upsample):
-                arguments = nn.Upsample.__init__.__code__.co_varnames[1:]
+            elif isinstance(child, (nn.Upsample, nn.UpsamplingBilinear2d)):
+                arguments = type(child).__init__.__code__.co_varnames[1:]
                 kwargs = {k: getattr(child, k) for k in arguments}
                 kwargs["mode"] = (
                     "trilinear" if kwargs["mode"] == "bilinear" else kwargs["mode"]
